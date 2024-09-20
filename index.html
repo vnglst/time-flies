@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Time Flies Clock - Flies on Digits Only</title>
+    <style>
+      body {
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background: #ffffff;
+      }
+      canvas {
+        border: 1px solid #ccc;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="clockCanvas"></canvas>
+    <script>
+      const canvas = document.getElementById("clockCanvas");
+      const ctx = canvas.getContext("2d");
+      canvas.width = 800;
+      canvas.height = 400;
+
+      class Fly {
+        constructor(x, y) {
+          this.x = x;
+          this.y = y;
+          this.targetX = x;
+          this.targetY = y;
+          this.speed = Math.random() * 3 + 1;
+          this.size = Math.random() * 3 + 1;
+          this.wingAngle = 0;
+          this.wingSpeed = Math.random() * 0.5 + 0.1;
+          this.isActive = false;
+        }
+
+        update() {
+          if (this.isActive) {
+            const dx = this.targetX - this.x;
+            const dy = this.targetY - this.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            if (distance > 1) {
+              this.x += (dx / distance) * this.speed;
+              this.y += (dy / distance) * this.speed;
+            } else {
+              this.x += (Math.random() - 0.5) * 2;
+              this.y += (Math.random() - 0.5) * 2;
+            }
+
+            this.wingAngle += this.wingSpeed;
+          }
+        }
+
+        draw() {
+          if (this.isActive) {
+            ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
+            ctx.beginPath();
+            ctx.ellipse(this.x, this.y, this.size, this.size * 1.5, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.strokeStyle = "rgba(0, 0, 0, 0.5)";
+            ctx.beginPath();
+            ctx.moveTo(this.x, this.y);
+            ctx.lineTo(
+              this.x + Math.cos(this.wingAngle) * this.size * 2,
+              this.y + Math.sin(this.wingAngle) * this.size * 2
+            );
+            ctx.moveTo(this.x, this.y);
+            ctx.lineTo(
+              this.x + Math.cos(this.wingAngle + Math.PI) * this.size * 2,
+              this.y + Math.sin(this.wingAngle + Math.PI) * this.size * 2
+            );
+            ctx.stroke();
+          }
+        }
+      }
+
+      const digits = [
+        // 0
+        [1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1],
+        // 1
+        [0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0],
+        // 2
+        [1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1],
+        // 3
+        [1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1],
+        // 4
+        [1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1],
+        // 5
+        [1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1],
+        // 6
+        [1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1],
+        // 7
+        [1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1],
+        // 8
+        [1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1],
+        // 9
+        [1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1],
+      ];
+
+      const flies = [];
+      let lastTime = "";
+
+      function createFlies() {
+        flies.length = 0;
+        for (let i = 0; i < 2000; i++) {
+          flies.push(new Fly(Math.random() * canvas.width, Math.random() * canvas.height));
+        }
+      }
+
+      function updateTime() {
+        const now = new Date();
+        const hours = now.getHours().toString().padStart(2, "0");
+        const minutes = now.getMinutes().toString().padStart(2, "0");
+        const currentTime = `${hours}${minutes}`;
+
+        if (currentTime !== lastTime) {
+          lastTime = currentTime;
+          setFlyTargets(currentTime);
+        }
+      }
+
+      function setFlyTargets(time) {
+        let flyIndex = 0;
+        // Reset all flies to inactive
+        flies.forEach((fly) => (fly.isActive = false));
+
+        for (let i = 0; i < 4; i++) {
+          const digit = parseInt(time[i]);
+          const digitPattern = digits[digit];
+          const startX = i * 180 + 50;
+          const startY = 100;
+
+          for (let y = 0; y < 5; y++) {
+            for (let x = 0; x < 4; x++) {
+              if (digitPattern[y * 4 + x]) {
+                for (let f = 0; f < 25; f++) {
+                  if (flyIndex < flies.length) {
+                    flies[flyIndex].targetX = startX + x * 30 + Math.random() * 20 - 10;
+                    flies[flyIndex].targetY = startY + y * 40 + Math.random() * 20 - 10;
+                    flies[flyIndex].isActive = true;
+                    flyIndex++;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      function animate() {
+        ctx.fillStyle = "rgba(255, 255, 255, 0.3)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        updateTime();
+
+        for (const fly of flies) {
+          fly.update();
+          fly.draw();
+        }
+
+        requestAnimationFrame(animate);
+      }
+
+      createFlies();
+      animate();
+    </script>
+  </body>
+</html>
