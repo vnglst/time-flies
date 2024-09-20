@@ -33,13 +33,11 @@
           this.targetX = x;
           this.targetY = y;
           this.speed = Math.random() * 3 + 1;
-          this.size = Math.random() * 3 + 1;
-          this.wingAngle = 0;
-          this.wingSpeed = Math.random() * 0.5 + 0.1;
+          this.size = 2; // Set a fixed size for all flies
           this.isActive = false;
         }
 
-        update() {
+        update(flies) {
           if (this.isActive) {
             const dx = this.targetX - this.x;
             const dy = this.targetY - this.y;
@@ -53,7 +51,20 @@
               this.y += (Math.random() - 0.5) * 2;
             }
 
-            this.wingAngle += this.wingSpeed;
+            // Collision avoidance
+            for (const otherFly of flies) {
+              if (otherFly !== this && otherFly.isActive) {
+                const otherDx = otherFly.x - this.x;
+                const otherDy = otherFly.y - this.y;
+                const otherDistance = Math.sqrt(otherDx * otherDx + otherDy * otherDy);
+
+                if (otherDistance < 5) {
+                  // Adjust the distance threshold as needed
+                  this.x -= otherDx / otherDistance;
+                  this.y -= otherDy / otherDistance;
+                }
+              }
+            }
           }
         }
 
@@ -61,22 +72,8 @@
           if (this.isActive) {
             ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
             ctx.beginPath();
-            ctx.ellipse(this.x, this.y, this.size, this.size * 1.5, 0, 0, Math.PI * 2);
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
             ctx.fill();
-
-            ctx.strokeStyle = "rgba(0, 0, 0, 0.5)";
-            ctx.beginPath();
-            ctx.moveTo(this.x, this.y);
-            ctx.lineTo(
-              this.x + Math.cos(this.wingAngle) * this.size * 2,
-              this.y + Math.sin(this.wingAngle) * this.size * 2
-            );
-            ctx.moveTo(this.x, this.y);
-            ctx.lineTo(
-              this.x + Math.cos(this.wingAngle + Math.PI) * this.size * 2,
-              this.y + Math.sin(this.wingAngle + Math.PI) * this.size * 2
-            );
-            ctx.stroke();
           }
         }
       }
@@ -109,7 +106,7 @@
 
       function createFlies() {
         flies.length = 0;
-        for (let i = 0; i < 2000; i++) {
+        for (let i = 0; i < 1000; i++) {
           flies.push(new Fly(Math.random() * canvas.width, Math.random() * canvas.height));
         }
       }
@@ -140,7 +137,7 @@
           for (let y = 0; y < 5; y++) {
             for (let x = 0; x < 4; x++) {
               if (digitPattern[y * 4 + x]) {
-                for (let f = 0; f < 25; f++) {
+                for (let f = 0; f < 20; f++) {
                   if (flyIndex < flies.length) {
                     flies[flyIndex].targetX = startX + x * 30 + Math.random() * 20 - 10;
                     flies[flyIndex].targetY = startY + y * 40 + Math.random() * 20 - 10;
@@ -161,7 +158,7 @@
         updateTime();
 
         for (const fly of flies) {
-          fly.update();
+          fly.update(flies);
           fly.draw();
         }
 
