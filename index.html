@@ -5,26 +5,61 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Time Flies Clock - Flies on Digits Only</title>
     <style>
+      html {
+        height: 100%;
+      }
+
       body {
         margin: 0;
+        padding: 0;
         display: flex;
+        flex-direction: column;
         justify-content: center;
         align-items: center;
-        height: 100vh;
-        background: #ffffff;
+        height: 100%;
+        background: conic-gradient(from 90deg at 50% 50%, #130301 0deg, #1d0501 120deg, #000000 240deg, #170401 360deg);
       }
+
       canvas {
-        border: 1px solid #ccc;
+        margin-top: auto;
+        display: block;
+        border-radius: 50%;
+        overflow: hidden;
+        font-family: monospace;
+        width: min(70vh, 80%);
+        max-width: 600px;
+        filter: drop-shadow(0 0 20px rgba(0, 0, 0, 0.25));
+        background: conic-gradient(from 0deg at -30% 30%, #edecdb 0deg, #f3eee3 120deg, #f8e2d9 240deg, #f9f7e1 360deg);
+      }
+
+      #made {
+        text-align: center;
+        line-height: 1.5;
+        font-family: monospace;
+        margin-top: auto;
+        margin-bottom: 20px;
+        font-size: 10px;
+        color: white;
+      }
+
+      a {
+        color: white;
+        text-decoration: none;
+        border-bottom: 1px solid white;
       }
     </style>
   </head>
   <body>
-    <canvas id="clockCanvas"></canvas>
+    <canvas id="canvas" width="800" height="800"></canvas>
+    <p id="made">
+      <!-- made by
+      <a href="https://koenvangilst.nl/labs/pong-wars">Koen van Gilst</a> | source on
+      <a href="https://github.com/vnglst/dancing-mosquitoes">github</a> -->
+    </p>
+
     <script>
-      const canvas = document.getElementById("clockCanvas");
+      const canvas = document.getElementById("canvas");
       const ctx = canvas.getContext("2d");
-      canvas.width = 800;
-      canvas.height = 400;
 
       class Fly {
         constructor(x, y) {
@@ -32,49 +67,65 @@
           this.y = y;
           this.targetX = x;
           this.targetY = y;
-          this.speed = Math.random() * 3 + 1;
+          this.speed = Math.random() * 2 + 1;
           this.size = 2; // Set a fixed size for all flies
-          this.isActive = false;
+          this.lastSpeedBump = Date.now();
+          this.oscillationOffset = Math.random() * Math.PI * 2; // Random phase offset for oscillation
+          this.oscillationDirectionX = Math.random() < 0.5 ? 1 : -1; // Random direction for X oscillation
+          this.oscillationDirectionY = Math.random() < 0.5 ? 1 : -1; // Random direction for Y oscillation
         }
 
         update(flies) {
-          if (this.isActive) {
-            const dx = this.targetX - this.x;
-            const dy = this.targetY - this.y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
+          const dx = this.targetX - this.x;
+          const dy = this.targetY - this.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
 
-            if (distance > 1) {
-              this.x += (dx / distance) * this.speed;
-              this.y += (dy / distance) * this.speed;
-            } else {
-              this.x += (Math.random() - 0.5) * 2;
-              this.y += (Math.random() - 0.5) * 2;
-            }
+          if (distance > 15) {
+            this.x += (dx / distance) * this.speed;
+            this.y += (dy / distance) * this.speed;
+          } else {
+            this.x += (Math.random() - 0.5) * 2;
+            this.y += (Math.random() - 0.5) * 2;
+          }
 
-            // Collision avoidance
-            for (const otherFly of flies) {
-              if (otherFly !== this && otherFly.isActive) {
-                const otherDx = otherFly.x - this.x;
-                const otherDy = otherFly.y - this.y;
-                const otherDistance = Math.sqrt(otherDx * otherDx + otherDy * otherDy);
+          // Add oscillation to make the flies dance
+          this.x +=
+            this.oscillationDirectionX * Math.sin(Date.now() / 100 + this.oscillationOffset) * Math.random() * 3;
+          this.y +=
+            this.oscillationDirectionY * Math.cos(Date.now() / 100 + this.oscillationOffset) * Math.random() * 3;
 
-                if (otherDistance < 5) {
-                  // Adjust the distance threshold as needed
-                  this.x -= otherDx / otherDistance;
-                  this.y -= otherDy / otherDistance;
-                }
+          // Change direction every once in a while
+          if (Date.now() - this.lastSpeedBump > Math.random() * 1000 + 500) {
+            // Change direction every second
+            this.oscillationDirectionX *= -1;
+            this.oscillationDirectionY *= -1;
+            this.lastSpeedBump = Date.now();
+          }
+
+          // Collision avoidance
+          for (const otherFly of flies) {
+            if (otherFly !== this) {
+              const otherDx = otherFly.x - this.x;
+              const otherDy = otherFly.y - this.y;
+              const otherDistance = Math.sqrt(otherDx * otherDx + otherDy * otherDy);
+
+              if (otherDistance < 10) {
+                // Adjust the distance threshold as needed
+                this.x -= otherDx / otherDistance;
+                this.y -= otherDy / otherDistance;
               }
             }
           }
         }
 
         draw() {
-          if (this.isActive) {
-            ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-            ctx.fill();
-          }
+          ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
+          ctx.beginPath();
+          ctx.moveTo(this.x, this.y - this.size);
+          ctx.lineTo(this.x - this.size, this.y + this.size);
+          ctx.lineTo(this.x + this.size, this.y + this.size);
+          ctx.closePath();
+          ctx.fill();
         }
       }
 
@@ -106,7 +157,7 @@
 
       function createFlies() {
         flies.length = 0;
-        for (let i = 0; i < 1000; i++) {
+        for (let i = 0; i < 1100; i++) {
           flies.push(new Fly(Math.random() * canvas.width, Math.random() * canvas.height));
         }
       }
@@ -125,23 +176,20 @@
 
       function setFlyTargets(time) {
         let flyIndex = 0;
-        // Reset all flies to inactive
-        flies.forEach((fly) => (fly.isActive = false));
 
         for (let i = 0; i < 4; i++) {
           const digit = parseInt(time[i]);
           const digitPattern = digits[digit];
-          const startX = i * 180 + 50;
-          const startY = 100;
+          const startX = canvas.width / 2 - 300 + i * 180;
+          const startY = canvas.height / 2 - 100;
 
           for (let y = 0; y < 5; y++) {
             for (let x = 0; x < 4; x++) {
               if (digitPattern[y * 4 + x]) {
-                for (let f = 0; f < 20; f++) {
+                for (let f = 0; f < 18; f++) {
                   if (flyIndex < flies.length) {
-                    flies[flyIndex].targetX = startX + x * 30 + Math.random() * 20 - 10;
-                    flies[flyIndex].targetY = startY + y * 40 + Math.random() * 20 - 10;
-                    flies[flyIndex].isActive = true;
+                    flies[flyIndex].targetX = startX + x * 30 + Math.random() * 10 - 10;
+                    flies[flyIndex].targetY = startY + y * 40 + Math.random() * 10 - 10;
                     flyIndex++;
                   }
                 }
@@ -152,8 +200,8 @@
       }
 
       function animate() {
-        ctx.fillStyle = "rgba(255, 255, 255, 0.3)";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "rgba(255, 255, 255, 1)";
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         updateTime();
 
