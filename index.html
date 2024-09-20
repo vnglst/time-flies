@@ -67,7 +67,7 @@
           this.y = y;
           this.targetX = x;
           this.targetY = y;
-          this.speed = Math.random() * 2 + 1;
+          this.speed = Math.random() * 3 + 1;
           this.size = 2; // Set a fixed size for all flies
           this.lastSpeedBump = Date.now();
           this.oscillationOffset = Math.random() * Math.PI * 2; // Random phase offset for oscillation
@@ -150,6 +150,8 @@
         [1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1],
         // 9
         [1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1],
+        // colon
+        [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
       ];
 
       const flies = [];
@@ -157,7 +159,7 @@
 
       function createFlies() {
         flies.length = 0;
-        for (let i = 0; i < 1100; i++) {
+        for (let i = 0; i < 1000; i++) {
           flies.push(new Fly(Math.random() * canvas.width, Math.random() * canvas.height));
         }
       }
@@ -166,7 +168,7 @@
         const now = new Date();
         const hours = now.getHours().toString().padStart(2, "0");
         const minutes = now.getMinutes().toString().padStart(2, "0");
-        const currentTime = `${hours}${minutes}`;
+        const currentTime = `${hours}:${minutes}`;
 
         if (currentTime !== lastTime) {
           lastTime = currentTime;
@@ -177,16 +179,29 @@
       function setFlyTargets(time) {
         let flyIndex = 0;
 
-        for (let i = 0; i < 4; i++) {
-          const digit = parseInt(time[i]);
-          const digitPattern = digits[digit];
-          const startX = canvas.width / 2 - 300 + i * 180;
+        let startX = -80;
+
+        for (let i = 0; i < 5; i++) {
+          let digitPattern;
+          if (time[i] === ":") {
+            digitPattern = digits[10]; // colon pattern
+            startX += 130; // Reduced spacing for colon
+          } else {
+            const digit = parseInt(time[i]);
+            digitPattern = digits[digit];
+            if (digit === 1) {
+              startX += 140; // Reduced spacing for digit 1
+            } else {
+              startX += 160; // Default spacing for other digits
+            }
+          }
+
           const startY = canvas.height / 2 - 100;
 
           for (let y = 0; y < 5; y++) {
             for (let x = 0; x < 4; x++) {
               if (digitPattern[y * 4 + x]) {
-                for (let f = 0; f < 18; f++) {
+                for (let f = 0; f < 16; f++) {
                   if (flyIndex < flies.length) {
                     flies[flyIndex].targetX = startX + x * 30 + Math.random() * 10 - 10;
                     flies[flyIndex].targetY = startY + y * 40 + Math.random() * 10 - 10;
@@ -195,6 +210,11 @@
                 }
               }
             }
+          }
+
+          // Adjust spacing after the colon
+          if (time[i] === ":") {
+            startX -= 50; // Reduce spacing after colon
           }
         }
       }
