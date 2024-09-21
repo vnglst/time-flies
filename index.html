@@ -172,7 +172,7 @@
           for (let y = 0; y < 5; y++) {
             for (let x = 0; x < 4; x++) {
               if (digitPattern[y * 4 + x]) {
-                for (let f = 0; f < 7; f++) {
+                for (let f = 0; f < 10; f++) {
                   if (flyIndex < flies.length) {
                     flies[flyIndex].targetX = startX + x * 30 + Math.random() * 10 - 10;
                     flies[flyIndex].targetY = startY + y * 40 + Math.random() * 10 - 10;
@@ -201,6 +201,7 @@
 
       function wrapTextAroundCircle(text, radius) {
         const circularText = document.getElementById("circular-text");
+        circularText.innerHTML = ""; // Clear previous text
         const angleStep = (2 * Math.PI) / text.length;
         text.split("").forEach((char, index) => {
           const span = document.createElement("span");
@@ -213,9 +214,17 @@
         });
       }
 
+      function updateCircularText() {
+        const boundingBox = canvas.getBoundingClientRect();
+        const radius = boundingBox.width / 1.8;
+        wrapTextAroundCircle("time flies time flies time flies time flies time flies ", radius);
+      }
+
       createFlies();
       animate();
-      wrapTextAroundCircle("time flies time flies time flies time flies time flies ", 255);
+      updateCircularText();
+
+      window.addEventListener("resize", updateCircularText); // Update text on window resize
     </script>
   </body>
 </html>
