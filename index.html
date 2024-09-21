@@ -172,7 +172,7 @@
           for (let y = 0; y < 5; y++) {
             for (let x = 0; x < 4; x++) {
               if (digitPattern[y * 4 + x]) {
-                for (let f = 0; f < 10; f++) {
+                for (let f = 0; f < 12; f++) {
                   if (flyIndex < flies.length) {
                     flies[flyIndex].targetX = startX + x * 30 + Math.random() * 10 - 10;
                     flies[flyIndex].targetY = startY + y * 40 + Math.random() * 10 - 10;
@@ -187,9 +187,16 @@
         }
       }
 
+      function setRandomFlyTargets() {
+        for (const fly of flies) {
+          fly.targetX = Math.random() * canvas.width;
+          fly.targetY = Math.random() * canvas.height;
+        }
+      }
+
       function animate() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        updateTime();
+        // updateTime();
 
         for (const fly of flies) {
           fly.update(flies);
@@ -223,8 +230,9 @@
       createFlies();
       animate();
       updateCircularText();
-
-      window.addEventListener("resize", updateCircularText); // Update text on window resize
+      window.addEventListener("resize", updateCircularText);
+      setTimeout(updateTime, 1000);
+      setInterval(setRandomFlyTargets, 30000);
     </script>
   </body>
 </html>
