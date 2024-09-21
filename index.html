@@ -3,20 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Time Flies Clock - Flies on Digits Only</title>
+    <title>Time Flies - Koen van Gilst</title>
     <style>
-      html {
-        height: 100%;
-      }
-
+      html,
       body {
+        height: 100%;
         margin: 0;
-        padding: 0;
         display: flex;
-        flex-direction: column;
         justify-content: center;
         align-items: center;
-        height: 100%;
         background: conic-gradient(from 90deg at 50% 50%, #130301 0deg, #1d0501 120deg, #000000 240deg, #170401 360deg);
       }
 
@@ -28,10 +23,7 @@
       }
 
       canvas {
-        display: block;
         border-radius: 50%;
-        overflow: hidden;
-        font-family: monospace;
         width: min(70vh, 80%);
         max-width: 600px;
         filter: drop-shadow(0 0 20px rgba(0, 0, 0, 0.25));
@@ -63,11 +55,6 @@
       <canvas id="canvas" width="800" height="800"></canvas>
       <div class="circular-text" id="circular-text"></div>
     </div>
-    <!-- <p id="made">
-      made by
-      <a href="https://koenvangilst.nl/labs/pong-wars">Koen van Gilst</a> | source on
-      <a href="https://github.com/vnglst/dancing-mosquitoes">github</a>
-    </p> -->
 
     <script>
       const canvas = document.getElementById("canvas");
@@ -80,11 +67,11 @@
           this.targetX = x;
           this.targetY = y;
           this.speed = Math.random() * 3 + 1;
-          this.size = 2; // Set a fixed size for all flies
+          this.size = 2;
           this.lastSpeedBump = Date.now();
-          this.oscillationOffset = Math.random() * Math.PI * 2; // Random phase offset for oscillation
-          this.oscillationDirectionX = Math.random() < 0.5 ? 1 : -1; // Random direction for X oscillation
-          this.oscillationDirectionY = Math.random() < 0.5 ? 1 : -1; // Random direction for Y oscillation
+          this.oscillationOffset = Math.random() * Math.PI * 2;
+          this.oscillationDirectionX = Math.random() < 0.5 ? 1 : -1;
+          this.oscillationDirectionY = Math.random() < 0.5 ? 1 : -1;
         }
 
         update(flies) {
@@ -100,21 +87,17 @@
             this.y += (Math.random() - 0.5) * 2;
           }
 
-          // Add oscillation to make the flies dance
           this.x +=
             this.oscillationDirectionX * Math.sin(Date.now() / 100 + this.oscillationOffset) * Math.random() * 3;
           this.y +=
             this.oscillationDirectionY * Math.cos(Date.now() / 100 + this.oscillationOffset) * Math.random() * 3;
 
-          // Change direction every once in a while
           if (Date.now() - this.lastSpeedBump > Math.random() * 1000 + 500) {
-            // Change direction every second
             this.oscillationDirectionX *= -1;
             this.oscillationDirectionY *= -1;
             this.lastSpeedBump = Date.now();
           }
 
-          // Collision avoidance
           for (const otherFly of flies) {
             if (otherFly !== this) {
               const otherDx = otherFly.x - this.x;
@@ -122,7 +105,6 @@
               const otherDistance = Math.sqrt(otherDx * otherDx + otherDy * otherDy);
 
               if (otherDistance < 10) {
-                // Adjust the distance threshold as needed
                 this.x -= otherDx / otherDistance;
                 this.y -= otherDy / otherDistance;
               }
@@ -142,27 +124,16 @@
       }
 
       const digits = [
-        // 0
         [1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1],
-        // 1
         [0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0],
-        // 2
         [1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1],
-        // 3
         [1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1],
-        // 4
         [1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1],
-        // 5
         [1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1],
-        // 6
         [1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1],
-        // 7
         [1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1],
-        // 8
         [1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1],
-        // 9
         [1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1],
-        // colon
         [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
       ];
 
@@ -190,23 +161,11 @@
 
       function setFlyTargets(time) {
         let flyIndex = 0;
-
         let startX = -80;
 
         for (let i = 0; i < 5; i++) {
-          let digitPattern;
-          if (time[i] === ":") {
-            digitPattern = digits[10]; // colon pattern
-            startX += 130; // Reduced spacing for colon
-          } else {
-            const digit = parseInt(time[i]);
-            digitPattern = digits[digit];
-            if (digit === 1) {
-              startX += 140; // Reduced spacing for digit 1
-            } else {
-              startX += 160; // Default spacing for other digits
-            }
-          }
+          const digitPattern = time[i] === ":" ? digits[10] : digits[parseInt(time[i])];
+          startX += time[i] === ":" ? 130 : parseInt(time[i]) === 1 ? 140 : 160;
 
           const startY = canvas.height / 2 - 100;
 
@@ -224,17 +183,12 @@
             }
           }
 
-          // Adjust spacing after the colon
-          if (time[i] === ":") {
-            startX -= 50; // Reduce spacing after colon
-          }
+          if (time[i] === ":") startX -= 50;
         }
       }
 
       function animate() {
-        ctx.fillStyle = "rgba(255, 255, 255, 1)";
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-
         updateTime();
 
         for (const fly of flies) {
