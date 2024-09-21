@@ -39,6 +39,7 @@
         flex-grow: 3;
         position: relative;
         display: flex;
+        flex-direction: column;
         justify-content: center;
         align-items: center;
         user-select: none;
@@ -53,20 +54,8 @@
         background: conic-gradient(from 0deg at -30% 30%, #edecdb 0deg, #f3eee3 120deg, #f8e2d9 240deg, #f9f7e1 360deg);
       }
 
-      .circular-text {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        pointer-events: none;
-      }
-
-      .circular-text span {
-        position: absolute;
-        white-space: nowrap;
-        font-weight: bold;
+      .label {
+        margin-top: 25px;
         color: rgb(220, 220, 220);
         font-family: monospace;
         font-size: 1rem;
@@ -92,7 +81,7 @@
   <body>
     <div class="container">
       <canvas id="canvas" width="800" height="800"></canvas>
-      <div class="circular-text" id="circular-text"></div>
+      <div class="label">time flies</div>
     </div>
     <p id="made">
       made by
@@ -274,32 +263,9 @@
         requestAnimationFrame(animate);
       }
 
-      function wrapTextAroundCircle(text, radius) {
-        const circularText = document.getElementById("circular-text");
-        circularText.innerHTML = ""; // Clear previous text
-        const angleStep = (2 * Math.PI) / text.length;
-        text.split("").forEach((char, index) => {
-          const span = document.createElement("span");
-          span.textContent = char;
-          const angle = index * angleStep - Math.PI / 2;
-          const x = radius * Math.cos(angle);
-          const y = radius * Math.sin(angle);
-          span.style.transform = `translate(${x}px, ${y}px) rotate(${angle + Math.PI / 2}rad)`;
-          circularText.appendChild(span);
-        });
-      }
-
-      function updateCircularText() {
-        const boundingBox = canvas.getBoundingClientRect();
-        const radius = boundingBox.width / 1.8;
-        wrapTextAroundCircle("time flies time flies time flies time flies time flies ", radius);
-      }
-
       createFlies();
       animate();
       setFlyTargets(lastTime);
-      updateCircularText();
-      window.addEventListener("resize", updateCircularText);
 
       let flyerTimeout;
 
