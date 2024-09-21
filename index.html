@@ -18,8 +18,15 @@
       src="https://plausible.koenvangilst.nl/js/script.js"
     ></script>
     <style>
+      *,
+      *:before,
+      *:after {
+        box-sizing: inherit;
+      }
+
       html,
       body {
+        box-sizing: border-box;
         height: 100%;
         margin: 0;
         display: flex;
@@ -34,6 +41,8 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        user-select: none;
+        -webkit-user-select: none;
       }
 
       canvas {
@@ -70,7 +79,6 @@
         margin-top: auto;
         margin-bottom: 20px;
         font-size: 10px;
-        color: white;
         color: rgb(220, 220, 220);
       }
 
@@ -292,7 +300,12 @@
       updateCircularText();
       window.addEventListener("resize", updateCircularText);
       // on button down or touch start, set random fly targets
-      window.addEventListener("pointerdown", setRandomFlyTargets);
+      window.addEventListener("pointerdown", () => {
+        setRandomFlyTargets();
+        setTimeout(() => {
+          setFlyTargets(lastTime);
+        }, 2000);
+      });
       // on button up or touch end, set fly targets
       window.addEventListener("pointerup", () => setFlyTargets(lastTime));
     </script>
