@@ -299,15 +299,22 @@
       animate();
       updateCircularText();
       window.addEventListener("resize", updateCircularText);
+
+      let flyerTimeout;
+
       // on button down or touch start, set random fly targets
       window.addEventListener("pointerdown", () => {
         setRandomFlyTargets();
-        setTimeout(() => {
+        flyerTimeout = setTimeout(() => {
           setFlyTargets(lastTime);
-        }, 2000);
+        }, 5000);
       });
+
       // on button up or touch end, set fly targets
-      window.addEventListener("pointerup", () => setFlyTargets(lastTime));
+      window.addEventListener("pointerup", () => {
+        clearTimeout(flyerTimeout);
+        setFlyTargets(lastTime);
+      });
     </script>
   </body>
 </html>
