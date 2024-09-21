@@ -83,14 +83,15 @@
             this.x += (dx / distance) * this.speed;
             this.y += (dy / distance) * this.speed;
           } else {
-            this.x += (Math.random() - 0.5) * 2;
-            this.y += (Math.random() - 0.5) * 2;
+            this.x += Math.random() * 4 - 2;
+            this.y += Math.random() * 4 - 2;
           }
 
-          this.x +=
-            this.oscillationDirectionX * Math.sin(Date.now() / 100 + this.oscillationOffset) * Math.random() * 3;
-          this.y +=
-            this.oscillationDirectionY * Math.cos(Date.now() / 100 + this.oscillationOffset) * Math.random() * 3;
+          const timeFactor = Date.now() / 100 + this.oscillationOffset;
+          const oscillationX = this.oscillationDirectionX * Math.sin(timeFactor) * 3;
+          const oscillationY = this.oscillationDirectionY * Math.cos(timeFactor) * 3;
+          this.x += oscillationX;
+          this.y += oscillationY;
 
           if (Date.now() - this.lastSpeedBump > Math.random() * 1000 + 500) {
             this.oscillationDirectionX *= -1;
@@ -102,9 +103,11 @@
             if (otherFly !== this) {
               const otherDx = otherFly.x - this.x;
               const otherDy = otherFly.y - this.y;
-              const otherDistance = Math.sqrt(otherDx * otherDx + otherDy * otherDy);
+              const otherDistanceSquared = otherDx * otherDx + otherDy * otherDy;
+              const thresholdSquared = 10 * 10;
 
-              if (otherDistance < 10) {
+              if (otherDistanceSquared < thresholdSquared) {
+                const otherDistance = Math.sqrt(otherDistanceSquared);
                 this.x -= otherDx / otherDistance;
                 this.y -= otherDy / otherDistance;
               }
@@ -113,7 +116,6 @@
         }
 
         draw() {
-          ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
           ctx.beginPath();
           ctx.moveTo(this.x, this.y - this.size);
           ctx.lineTo(this.x - this.size, this.y + this.size);
@@ -136,6 +138,20 @@
         [1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1],
         [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
       ];
+
+      const digitLookupTable = {
+        0: digits[0],
+        1: digits[1],
+        2: digits[2],
+        3: digits[3],
+        4: digits[4],
+        5: digits[5],
+        6: digits[6],
+        7: digits[7],
+        8: digits[8],
+        9: digits[9],
+        ":": digits[10],
+      };
 
       const flies = [];
       let lastTime = "";
@@ -169,7 +185,7 @@
         let startX = -80;
 
         for (let i = 0; i < 5; i++) {
-          const digitPattern = time[i] === ":" ? digits[10] : digits[parseInt(time[i])];
+          const digitPattern = digitLookupTable[time[i]];
           startX += time[i] === ":" ? 130 : parseInt(time[i]) === 1 ? 140 : 160;
 
           const startY = canvas.height / 2 - 100;
@@ -194,10 +210,8 @@
 
       function setRandomFlyTargets() {
         for (const fly of flies) {
-          if (Math.random() < 0.4) {
-            fly.targetX = Math.random() * canvas.width;
-            fly.targetY = Math.random() * canvas.height;
-          }
+          fly.targetX = Math.random() * canvas.width;
+          fly.targetY = Math.random() * canvas.height;
         }
       }
 
