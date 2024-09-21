@@ -4,18 +4,32 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Time Flies - Koen van Gilst</title>
+    <meta
+      name="description"
+      content="A visualization of the passage of time. Written in JavaScript with some HTML & CSS in one index.html. Feel free to reuse the code and create your own version."
+    />
+    <link rel="canonical" href="https://time-flies.koenvangilst.nl/" />
+    <link rel="author" href="https://koenvangilst.nl" />
+    <meta name="theme-color" content="#130301" />
+    <meta name="creator" content="Koen van Gilst" />
+    <script
+      defer
+      data-domain="time-flies.koenvangilst.nl"
+      src="https://plausible.koenvangilst.nl/js/script.js"
+    ></script>
     <style>
       html,
       body {
         height: 100%;
         margin: 0;
         display: flex;
+        flex-direction: column;
         justify-content: center;
-        align-items: center;
         background: conic-gradient(from 90deg at 50% 50%, #130301 0deg, #1d0501 120deg, #000000 240deg, #170401 360deg);
       }
 
       .container {
+        flex-grow: 3;
         position: relative;
         display: flex;
         justify-content: center;
@@ -48,6 +62,23 @@
         font-family: monospace;
         font-size: 1rem;
       }
+
+      #made {
+        text-align: center;
+        line-height: 1.8;
+        font-family: monospace;
+        margin-top: auto;
+        margin-bottom: 20px;
+        font-size: 10px;
+        color: white;
+        color: rgb(220, 220, 220);
+      }
+
+      a {
+        color: white;
+        text-decoration: none;
+        border-bottom: 1px solid white;
+      }
     </style>
   </head>
   <body>
@@ -55,6 +86,13 @@
       <canvas id="canvas" width="800" height="800"></canvas>
       <div class="circular-text" id="circular-text"></div>
     </div>
+    <p id="made">
+      made by
+      <a href="https://koenvangilst.nl">Koen van Gilst</a> | idea by
+      <a href="http://www.mennoanker.nl/">Menno Anker</a> <br />
+      source on
+      <a href="https://github.com/vnglst/time-flies">github</a>
+    </p>
 
     <script>
       const canvas = document.getElementById("canvas");
