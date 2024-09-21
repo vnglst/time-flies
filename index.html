@@ -159,7 +159,7 @@
 
       function createFlies() {
         flies.length = 0;
-        for (let i = 0; i < 1000; i++) {
+        for (let i = 0; i < 500; i++) {
           flies.push(new Fly(Math.random() * canvas.width, Math.random() * canvas.height));
         }
       }
@@ -201,7 +201,7 @@
           for (let y = 0; y < 5; y++) {
             for (let x = 0; x < 4; x++) {
               if (digitPattern[y * 4 + x]) {
-                for (let f = 0; f < 16; f++) {
+                for (let f = 0; f < 7; f++) {
                   if (flyIndex < flies.length) {
                     flies[flyIndex].targetX = startX + x * 30 + Math.random() * 10 - 10;
                     flies[flyIndex].targetY = startY + y * 40 + Math.random() * 10 - 10;
